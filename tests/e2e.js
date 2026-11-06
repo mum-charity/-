@@ -228,6 +228,39 @@ function check(cond, msg) {
   await shot('13-month-dark');
   await page.emulateMedia({ colorScheme: 'light' });
 
+  // --- demo mode: sample data, kept apart from the real records
+  const realBefore = await page.evaluate(() => localStorage.getItem('dana-ledger:v1'));
+  await page.evaluate(() => {
+    const s = JSON.parse(localStorage.getItem('dana-ledger:v1'));
+    s.settings.fontSize = 'large';
+    localStorage.setItem('dana-ledger:v1', JSON.stringify(s));
+  });
+  const realKept = await page.evaluate(() => localStorage.getItem('dana-ledger:v1'));
+  await page.goto(base + '?demo');
+  await page.waitForSelector('.demo-bar');
+  check((await page.locator('.fund-card').count()) === 2, 'demo shows 2 sample funds');
+  check((await text('.fund-card')).includes('Bhante 医疗费用'), 'demo first fund is the medical fund');
+  await shot('20-demo-home');
+  await page.locator('.fund-card').first().click();
+  await page.waitForSelector('.people');
+  const paidNow = await page.locator('.person.is-paid').count();
+  const allNow = await page.locator('.person').count();
+  check(paidNow > 0 && paidNow < allNow, `demo month is partly ticked (${paidNow}/${allNow})`);
+  await shot('21-demo-month');
+  await page.locator('.person:not(.is-paid) .tick').first().click();
+  check((await page.locator('.person.is-paid').count()) === paidNow + 1, 'ticking works in demo');
+  await page.click('.tab:has-text("全年表")');
+  await page.waitForSelector('.grid');
+  await shot('22-demo-year');
+  await page.click('.tab:has-text("名单")');
+  await page.waitForSelector('.roster');
+  await shot('23-demo-people');
+  check((await page.evaluate(() => localStorage.getItem('dana-ledger:v1'))) === realKept, 'demo never touches the real records');
+  await page.click('[data-action=demo-exit]');
+  await page.waitForSelector('.fund-card');
+  check(!(await page.locator('.demo-bar').count()) && (await text('.fund-card')).includes('RM 299'), 'leaving demo returns to the real records');
+  check(!!realBefore, 'real records existed before demo');
+
   check(errors.length === 0, 'no console errors' + (errors.length ? ': ' + errors.join(' | ') : ''));
   await browser.close();
   server.close();

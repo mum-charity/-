@@ -224,6 +224,28 @@ b, strong { font-weight: 700; }
 .banner-go { font-size: 1.6rem; color: var(--muted); }
 .banner-danger { border-color: var(--danger); background: var(--danger-soft); color: var(--danger); font-weight: 600; }
 
+/* ------------------------------------------------------------ demo mode */
+.demo-bar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  padding: calc(env(safe-area-inset-top) + 8px) 12px 8px;
+  background: #2f5d8a;
+  color: #fff;
+  font-size: 0.88rem;
+}
+.demo-text { flex: 1 1 12em; }
+.demo-btn {
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  background: transparent;
+  color: #fff;
+  font-weight: 700;
+}
+
 /* ------------------------------------------------------------ home */
 .fund-card { text-align: left; width: 100%; gap: 8px; }
 .fund-card:active { background: var(--surface-2); }
@@ -599,3 +621,4 @@ select.input {
   .year-totals { grid-template-columns: repeat(4, 1fr); }
   .year-totals div { border: 1px solid #999; padding: 4px 8px; }
 }
+@media print { .demo-bar { display: none !important; } }

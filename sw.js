@@ -3,13 +3,14 @@
  * Bump VERSION on every deploy so phones pick up the new files.
  * It only caches the app's own files. Records live in localStorage and are never touched here.
  */
-const VERSION = '1.0.1';
+const VERSION = '1.1.0';
 const CACHE = 'dana-ledger-' + VERSION;
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './model.js',
+  './demo.js',
   './app.js',
   './manifest.webmanifest',
   './icons/icon-192.png',

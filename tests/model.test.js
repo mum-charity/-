@@ -216,3 +216,29 @@ test('share text summarises the month', () => {
   assert.match(t, /交出 7\/5：RM 10（交给 Bhante）/);
   assert.ok(b);
 });
+
+test('demo data is valid and looks like a real book', () => {
+  const Demo = require('../demo.js');
+  const now = new Date('2026-11-06T10:00:00');
+  const s = Demo.build(L, now);
+  const again = Demo.build(L, now);
+  assert.deepEqual(again.receipts.map((r) => [r.month, r.amount, r.date]), s.receipts.map((r) => [r.month, r.amount, r.date]), 'same every time');
+
+  const { state, dropped } = L.normalizeState(JSON.parse(L.backupJSON(s)));
+  assert.equal(dropped, 0);
+  assert.equal(state.funds.length, 2);
+  for (const r of s.receipts) assert.ok(r.date <= '2026-11-06', 'no receipt dated in the future');
+  for (const p of s.payouts) assert.ok(p.date <= '2026-11-06', 'no payout dated in the future');
+
+  for (const f of s.funds) {
+    const g = L.yearGrid(s, f.id, 2026);
+    g.balance.slice(0, 11).forEach((b) => assert.ok(b >= 0, `${f.name} balance never negative`));
+    const nov = L.monthSummary(s, f.id, '2026-11');
+    assert.ok(nov.receivedCount > 0 && nov.receivedCount < nov.members.length, `${f.name}: this month partly collected`);
+  }
+  const med = s.funds[0];
+  assert.ok(L.prepaidAfter(s, med.id, '2026-11') > 0, 'has a prepayment for later months');
+  assert.ok(s.payouts.some((p) => p.note === '做茶点'), 'has a small expense');
+  const grid = L.yearGrid(s, med.id, 2026);
+  assert.ok(grid.rows.some((r) => r.cells.some((c) => !c.active)), 'someone joined late or stopped');
+});

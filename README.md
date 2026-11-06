@@ -2,6 +2,8 @@
 
 **App link:** https://mum-charity.github.io/-/
 
+**Demo with made-up sample data:** https://mum-charity.github.io/-/?demo. The demo keeps its data separately, so trying things there never touches the real records. Tap 重来 to reset it or 离开示范 to leave.
+
 A small offline web app (PWA) for keeping a monthly donation book. It works like a paper book:
 
 - Each **fund** (项目) has a numbered list of people. Each person gives a set amount every month, or a different amount each time.

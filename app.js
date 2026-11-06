@@ -3,8 +3,11 @@
   'use strict';
 
   const L = window.Ledger;
-  const APP_VERSION = '1.0.1';
-  const STORE_KEY = 'dana-ledger:v1';
+  const APP_VERSION = '1.1.0';
+  // Demo mode (?demo) shows made-up sample data, saved under its own key so it
+  // never mixes with the real records.
+  const DEMO = new URLSearchParams(location.search).has('demo');
+  const STORE_KEY = DEMO ? 'dana-ledger:demo' : 'dana-ledger:v1';
   const BACKUP_NAG_DAYS = 14;
 
   const app = document.getElementById('app');
@@ -29,7 +32,7 @@
       storageOK = false;
       return L.emptyState();
     }
-    if (!raw) return L.emptyState();
+    if (!raw) return DEMO && window.LedgerDemo ? window.LedgerDemo.build(L) : L.emptyState();
     try {
       return L.normalizeState(JSON.parse(raw)).state;
     } catch (e) {
@@ -139,7 +142,7 @@
 
   function backupBanner() {
     const st = state.settings;
-    if (!state.funds.length || !st.changesSinceBackup) return '';
+    if (DEMO || !state.funds.length || !st.changesSinceBackup) return '';
     const days = daysSince(st.lastBackupAt);
     if (days < BACKUP_NAG_DAYS && st.changesSinceBackup < 30) return '';
     const msg = st.lastBackupAt ? `已经 ${days} 天没有备份了` : '还没有备份过';
@@ -161,6 +164,7 @@
         <p>先新增一个项目，例如「Bhante 医疗费用」或「Dana Parami」，再把捐款人的名单加进去。</p>
         <button class="btn btn-primary btn-block" data-action="fund-new">＋ 新增项目</button>
         <button class="btn btn-ghost btn-block" data-action="restore">从备份恢复</button>
+        ${DEMO ? '' : '<button class="link-btn" data-action="demo-open">先看看示范（假资料）</button>'}
       </section>`;
     } else {
       body += `<p class="section-label">${L.monthLabel(month)}</p><div class="stack">`;
@@ -443,8 +447,14 @@
     else if (r.name === 'people') html = viewPeople(r);
     else if (r.name === 'settings') html = viewSettings();
     else html = viewHome();
+    if (DEMO) {
+      html =
+        `<div class="demo-bar" role="note"><span class="demo-text"><strong>示范模式</strong>：全是假资料，可以随便点。</span>
+          <button class="demo-btn" data-action="demo-reset">重来</button>
+          <button class="demo-btn" data-action="demo-exit">离开示范</button></div>` + html;
+    }
     app.innerHTML = html;
-    document.title = r.fund ? `${r.fund.name} · 善款簿` : '善款簿';
+    document.title = (DEMO ? '示范 · ' : '') + (r.fund ? `${r.fund.name} · 善款簿` : '善款簿');
     const newWrap = app.querySelector('.grid-wrap');
     if (newWrap) newWrap.scrollLeft = lastGridScroll;
   }
@@ -818,7 +828,7 @@
   }
 
   async function doBackup() {
-    const how = await shareOrDownload(`善款簿备份-${L.todayISO()}.json`, L.backupJSON(state), 'application/json');
+    const how = await shareOrDownload(`${DEMO ? '善款簿示范' : '善款簿备份'}-${L.todayISO()}.json`, L.backupJSON(state), 'application/json');
     if (!how) return;
     state.settings.lastBackupAt = Date.now();
     state.settings.changesSinceBackup = 0;
@@ -968,6 +978,20 @@
       state.settings.fontSize = el.dataset.size;
       persist();
       render();
+    },
+
+    'demo-open': () => {
+      location.href = location.pathname + '?demo';
+    },
+    'demo-exit': () => {
+      location.href = location.pathname;
+    },
+    'demo-reset': async () => {
+      const yes = await confirmBox({ title: '把示范资料重来一次？', message: '你在示范里改过的东西会还原。真正的记录不受影响。', ok: '重来' });
+      if (!yes) return;
+      try { localStorage.removeItem(STORE_KEY); } catch (_) { /* ignore */ }
+      state = loadState();
+      nav('#/', true);
     },
 
     'sheet-close': () => closeSheet(),
