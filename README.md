@@ -16,7 +16,31 @@ A small offline web app (PWA) for keeping a monthly donation book. It works like
 
 The interface is Simplified Chinese with large text, and amounts are in RM (you can change the currency in 设置).
 
+## Current status
+
+Last checked on 7 Nov 2026.
+
+**The live app is ahead of this repo.** https://mum.franklee.asia/ runs version 1.4.0, while `dev` and `main` are at 1.1.1. The 1.4.0 source isn't in git, and the rest of this README describes 1.1.1.
+
+| Copy | Version | Backup |
+|---|---|---|
+| https://mum.franklee.asia/ | 1.4.0 | Automatic, to the family's backup server |
+| GitHub Pages | 1.1.1 | Manual backup file |
+| This repo (`dev`, `main`) | 1.1.1 | Manual backup file |
+
+In 1.4.0, `app.js` sends records to the backup server by itself whenever there is signal, and the 保存备份文件 button is gone. The other app files match this repo, apart from the version number in `sw.js` and line endings.
+
+Still to do:
+
+- Get the 1.4.0 source into git. It may still be on another machine. If it isn't, `app.js` and `sw.js` can be rebuilt from the live site.
+- Find the backup server's source, which isn't in this repo.
+- Confirm that records reach the backup server. Its health check passes, but that doesn't show backups are arriving.
+- Run the unit and end-to-end tests on 1.4.0.
+- Update this README for 1.4.0, and decide whether GitHub Pages should move to it too.
+
 ## Where the data lives
+
+This section describes 1.1.1. The live app (1.4.0) also sends records to the backup server. See [Current status](#current-status).
 
 Records are stored **only on the phone**, in the browser's localStorage for this site. Nothing is sent anywhere. The hosted site only serves the app's code.
 
@@ -39,6 +63,8 @@ npm install && npm run test:e2e   # drives the real app in Edge on a phone-sized
 The end-to-end test fixes the date to 6 Nov 2026. It creates a fund, ticks people as paid, prepays a year, records a payout, and checks the year table's balances against hand-worked numbers. It also checks offline use, backup, wipe-and-restore and the CSV export. Screenshots go to `.e2e-out/`.
 
 ## Deploy (Cloudflare)
+
+**Don't deploy from this repo yet.** `npm run deploy` would replace 1.4.0 with 1.1.1 and stop the automatic backups. See [Current status](#current-status).
 
 The app at https://mum.franklee.asia/ is a static-assets-only Cloudflare Worker, set up in `wrangler.jsonc`.
 
