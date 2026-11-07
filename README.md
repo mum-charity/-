@@ -4,7 +4,7 @@
 
 **Demo with made-up sample data:** https://mum.franklee.asia/?demo. The demo keeps its data separately, so trying things there never touches the real records. Tap 重来 to reset it or 离开示范 to leave.
 
-The same app is also on GitHub Pages at https://mum-charity.github.io/-/. Each address keeps its own records, so she should use only one of them. To move records from one to the other, save a backup at the old address and restore it at the new one.
+The same app is also on GitHub Pages at https://mum-charity.github.io/dana-ledger/. Each address keeps its own records, so she should use only one of them. To move records from one to the other, save a backup at the old address and restore it at the new one.
 
 A small offline web app (PWA) for keeping a monthly donation book. It works like a paper book:
 
