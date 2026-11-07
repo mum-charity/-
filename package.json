@@ -5,7 +5,9 @@
   "description": "善款簿 — offline monthly donation ledger (PWA)",
   "scripts": {
     "test": "node --test tests/model.test.js",
-    "test:e2e": "node tests/e2e.js"
+    "test:e2e": "node tests/e2e.js",
+    "deploy": "node scripts/build.js && npx -y wrangler@4.158.0 deploy",
+    "build": "node scripts/build.js"
   },
   "devDependencies": {
     "playwright-core": "1.55.0"
