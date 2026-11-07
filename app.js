@@ -3,7 +3,7 @@
   'use strict';
 
   const L = window.Ledger;
-  const APP_VERSION = '1.1.0';
+  const APP_VERSION = '1.1.1';
   // Demo mode (?demo) shows made-up sample data, saved under its own key so it
   // never mixes with the real records.
   const DEMO = new URLSearchParams(location.search).has('demo');

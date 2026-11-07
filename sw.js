@@ -3,11 +3,12 @@
  * Bump VERSION on every deploy so phones pick up the new files.
  * It only caches the app's own files. Records live in localStorage and are never touched here.
  */
-const VERSION = '1.1.0';
+const VERSION = '1.1.1';
 const CACHE = 'dana-ledger-' + VERSION;
+// './' is the page itself (index.html). Cache it as './', never './index.html': Cloudflare
+// redirects /index.html to /, and a browser refuses to open a page from a redirected response.
 const ASSETS = [
   './',
-  './index.html',
   './style.css',
   './model.js',
   './demo.js',
@@ -45,7 +46,7 @@ self.addEventListener('fetch', (event) => {
 
   if (req.mode === 'navigate') {
     // Any page inside the app opens the cached app shell.
-    event.respondWith(caches.match('./index.html').then((hit) => hit || fetch(req)));
+    event.respondWith(caches.match('./').then((hit) => hit || fetch(req)));
     return;
   }
   event.respondWith(caches.match(req, { ignoreSearch: true }).then((hit) => hit || fetch(req)));
