@@ -1,8 +1,10 @@
 # 善款簿 (Dana Ledger)
 
-**App link:** https://mum-charity.github.io/-/
+**App link:** https://mum.franklee.asia/
 
-**Demo with made-up sample data:** https://mum-charity.github.io/-/?demo. The demo keeps its data separately, so trying things there never touches the real records. Tap 重来 to reset it or 离开示范 to leave.
+**Demo with made-up sample data:** https://mum.franklee.asia/?demo. The demo keeps its data separately, so trying things there never touches the real records. Tap 重来 to reset it or 离开示范 to leave.
+
+The same app is also on GitHub Pages at https://mum-charity.github.io/-/. Each address keeps its own records, so she should use only one of them. To move records from one to the other, save a backup at the old address and restore it at the new one.
 
 A small offline web app (PWA) for keeping a monthly donation book. It works like a paper book:
 
@@ -36,6 +38,17 @@ npm install && npm run test:e2e   # drives the real app in Edge on a phone-sized
 
 The end-to-end test fixes the date to 6 Nov 2026. It creates a fund, ticks people as paid, prepays a year, records a payout, and checks the year table's balances against hand-worked numbers. It also checks offline use, backup, wipe-and-restore and the CSV export. Screenshots go to `.e2e-out/`.
 
+## Deploy (Cloudflare)
+
+The app at https://mum.franklee.asia/ is a static-assets-only Cloudflare Worker, set up in `wrangler.jsonc`.
+
+```sh
+npx wrangler@4.158.0 login   # first time only: approve in the browser within about 2 minutes
+npm run deploy               # copies the app's files into dist/, then uploads them
+```
+
+`npm run deploy` uploads only the files listed in `ASSETS` in `sw.js`, plus `index.html` and `sw.js`, so the README, tests and `node_modules` stay private. Cloudflare redirects `/index.html` to `/`, so the service worker caches the page as `./`. The end-to-end test's server does the same redirect.
+
 ## Deploy (GitHub Pages)
 
 1. Push this folder to a GitHub repo.
@@ -57,6 +70,8 @@ All paths are relative, so it works from a sub-path.
 | `sw.js` | Offline cache (app files only, never the records) |
 | `manifest.webmanifest`, `icons/` | Home-screen install |
 | `tests/model.test.js` | Unit tests for balances, prepayments, import and CSV |
+| `tests/e2e.js` | End-to-end test in Edge on a phone-sized screen |
+| `wrangler.jsonc`, `scripts/build.js` | Cloudflare deploy: settings, and the copy of the app's files into `dist/` |
 
 ## First-time setup for mum
 
