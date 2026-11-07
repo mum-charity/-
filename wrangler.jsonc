@@ -1,0 +1,12 @@
+// Cloudflare deploy for 善款簿: a static-assets-only Worker on mum.franklee.asia.
+// Deploy with: npm run deploy   (first time: npx wrangler@4.158.0 login)
+{
+  "name": "mum-dana-ledger",
+  "compatibility_date": "2025-10-01",
+  "assets": {
+    "directory": "./dist"
+  },
+  "routes": [{ "pattern": "mum.franklee.asia", "custom_domain": true }],
+  "workers_dev": false,
+  "preview_urls": false
+}
